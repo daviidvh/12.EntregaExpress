@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Detalles del vuelo</title>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        main {
+            margin-top: 20px;
+        }
+
+        .card {
+            margin: 0 auto;
+            max-width: 540px;
+        }
+
+        form {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        h5 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+        }
+
+        .btn-success {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="text-center">Editar vuelo</h1>
+    <main class="flex-container">
+        <div id="main" class="row">
+            <div class="card mb-3">
+                        <div class="card-body">
+                            <form action="" method="">
+                                <h5 class="card-title" id="numero_vuelo"></h5>
+                                <input name="aerolinea" type="text" class="form-control form-control-lg" placeholder="Aerolínea">
+                                <input type="text" class="form-control form-control-lg" name="destino" placeholder="Destino">
+                                <input type="text" class="form-control form-control-lg" name="origen" placeholder="Origen">
+                                <input type="text" class="form-control form-control-lg" name="fecha_llegada" placeholder="Fecha llegada">
+                                <input type="text" class="form-control form-control-lg" name="hora_llegada" placeholder="Hora llegada">
+                                <input type="text" class="form-control form-control-lg" name="fecha_salida" placeholder="Fecha salida">
+                                <input type="text" class="form-control form-control-lg" name="hora_salida" placeholder="Hora salida">
+                                <button type="button" onclick ="update()" class="btn btn-success">Actualizar</button>
+                            </form>
+                        </div>
+            </div>
+            <a href="/vuelos/index" class="btn btn-secondary">Atras</a>
+        </div>
+    </main>
+</body>
+
+<script>
+    let elemento_formulario = document.forms[0].elements;
+
+    let path = window.location.pathname.split("/");
+    let id = path[path.length-1];
+
+    fetch(`/vuelos/detalleVuelo/${id}`)
+    .then((response) => response.json())
+    .then((vuelo) => {
+            console.log(vuelo);
+            document.getElementById("numero_vuelo").textContent = vuelo[0].numero_vuelo;
+            elemento_formulario.aerolinea.value = vuelo[0].aerolinea;
+            elemento_formulario.destino.value = vuelo[0].destino;
+            elemento_formulario.origen.value = vuelo[0].origen;
+            elemento_formulario.fecha_llegada.value = vuelo[0].fecha_llegada;
+            elemento_formulario.hora_llegada.value = vuelo[0].hora_llegada;
+            elemento_formulario.fecha_salida.value = vuelo[0].fecha_salida;
+            elemento_formulario.hora_salida.value = vuelo[0].hora_salida;
+    });
+
+
+    function update(){
+        
+        let vuelo = {
+            aerolinea : elemento_formulario.aerolinea.value ,
+            destino : elemento_formulario.destino.value,
+            origen : elemento_formulario.origen.value,
+            fecha_llegada : elemento_formulario.fecha_llegada.value,
+            hora_llegada : elemento_formulario.hora_llegada.value,
+            fecha_salida : elemento_formulario.fecha_salida.value,
+            hora_salida : elemento_formulario.hora_salida.value
+        };
+
+        fetch(`/vuelos/actualizar/${id}`,{
+            method: "PUT",
+            headers : {
+                "Content-Type" : "application/json"
+            },
+            body : JSON.stringify(vuelo)
+        })
+        .then(response => response.json())
+        .then(respuesta => {
+            console.log(respuesta)
+            if (respuesta.estado === true) {
+                window.location.href = "/vuelos/index";
+            } else {
+                // Manejar el caso en el que la actualización no fue exitosa
+                console.error("Error en la actualización:", respuesta.mensaje);
+            }
+    });
+}
+</script>
+</html>
